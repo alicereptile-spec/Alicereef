@@ -1,185 +1,100 @@
-index.html
+<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alicereef Pro - Apex Live Control</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <title>Alicereef Pro - Apex Live</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
-        :root { --bg: #03070b; --panel: #0b141d; --accent: #00d2ff; --temp: #ff3e3e; --ph: #2ecc71; --gold: #f1c40f; --alert: #ff0000; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #e0e6ed; margin: 0; padding: 12px; }
-        .container { max-width: 450px; margin: auto; }
-        
-        .header { background: linear-gradient(145deg, #0b141d, #050a12); padding: 25px 15px; border-radius: 15px; text-align: center; border: 1px solid rgba(0,210,255,0.3); margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .header h1 { margin: 0; font-size: 24px; color: var(--accent); text-transform: uppercase; letter-spacing: 4px; font-weight: 900; }
-        .status-bar { font-size: 9px; color: #5c6d7e; text-transform: uppercase; margin-top: 8px; letter-spacing: 1px; }
-
-        .live-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-        .live-card { background: var(--panel); border-radius: 12px; padding: 18px 10px; text-align: center; border: 1px solid #1a2633; transition: 0.3s; }
-        .live-val { font-size: 34px; font-weight: 700; display: block; margin: 5px 0; font-family: monospace; }
-        .label { font-size: 9px; text-transform: uppercase; color: #5c6d7e; letter-spacing: 1.5px; font-weight: bold; }
-        
-        .alert-active { border: 1px solid var(--alert) !important; box-shadow: 0 0 15px rgba(255,0,0,0.3) !important; animation: apex-blink 0.8s infinite alternate; }
-        @keyframes apex-blink { from { background: var(--panel); } to { background: rgba(255,0,0,0.15); } }
-
-        .light-box { background: var(--panel); border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid #1a2633; }
-        .ch-bars { display: flex; align-items: flex-end; height: 90px; gap: 10px; margin-top: 15px; background: #050a12; padding: 12px; border-radius: 8px; border: 1px solid #1a2633; }
-        .bar { flex: 1; background: linear-gradient(to top, #00d2ff, #0089d8); position: relative; transition: height 1.2s ease; min-height: 4px; }
-        .bar span { position: absolute; top: -18px; width: 100%; text-align: center; font-size: 9px; color: var(--accent); font-family: monospace; }
-        .bar-label { position: absolute; bottom: -22px; width: 100%; text-align: center; font-size: 8px; color: #5c6d7e; }
-
-        .section-box { background: var(--panel); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #1a2633; }
-        .grid-inputs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
-        input { background: #03070b; border: 1px solid #1a2633; color: var(--accent); padding: 10px; border-radius: 6px; font-size: 11px; outline: none; width: 80%; }
-        .btn { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--accent); font-weight: 800; cursor: pointer; margin-top: 12px; background: #1a2633; color: var(--accent); text-transform: uppercase; font-size: 11px; transition: 0.2s; }
-        .btn:active { background: var(--accent); color: #03070b; }
-
-        .status-footer { display: flex; justify-content: space-around; padding: 12px; background: #050a12; border-radius: 10px; font-size: 9px; color: #2ecc71; border: 1px solid rgba(46,204,113,0.2); }
+        :root { --bg: #03070b; --panel: #0b141a; --accent: #00d1ff; --safe: #00ff88; --danger: #ff3b3b; }
+        body { font-family: sans-serif; background: var(--bg); color: #e0e0e0; margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .container { max-width: 450px; width: 100%; }
+        .header { background: linear-gradient(180deg, #0a1e29 0%, #03070b 100%); padding: 20px; border-radius: 15px; border: 1px solid #1a3a4a; text-align: center; margin-bottom: 20px; }
+        .header h1 { margin: 0; font-size: 22px; color: var(--accent); letter-spacing: 2px; }
+        .status-bar { font-size: 10px; color: #5a7d8e; margin-top: 5px; }
+        .live-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .live-card { background: var(--panel); padding: 15px; border-radius: 12px; border-left: 3px solid var(--accent); text-align: center; }
+        .live-val { font-size: 32px; font-weight: bold; margin: 5px 0; font-family: monospace; }
+        .label { font-size: 10px; text-transform: uppercase; color: #5a7d8e; }
+        .light-box { background: var(--panel); padding: 15px; border-radius: 12px; margin-top: 20px; border: 1px solid #1a3a4a; }
+        .bar-container { display: flex; gap: 10px; height: 50px; align-items: flex-end; margin-top: 10px; }
+        .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .bar { width: 100%; background: #1a3a4a; border-radius: 2px; position: relative; height: 40px; }
+        .bar-fill { position: absolute; bottom: 0; width: 100%; background: var(--accent); transition: height 0.5s; }
+        .bar-perc { font-size: 10px; color: var(--accent); margin-bottom: 2px; }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <div class="header">
-        <h1>ALICEREEF PRO</h1>
-        <div id="statusInfo" class="status-bar">CONNECTING TO TUYA CLOUD...</div>
-    </div>
-
-    <div class="live-grid">
-        <div class="live-card" id="tempBox">
-            <span class="label"><i class="fas fa-thermometer-half"></i> TEMP LIVE</span>
-            <span class="live-val" id="realTemp" style="color: var(--temp);">--.-°</span>
+    <div class="container">
+        <div class="header">
+            <h1>ALICEREEF PRO</h1>
+            <div id="status" class="status-bar">CONNECTING TO EUROPE DATA CENTER...</div>
         </div>
-        <div class="live-card" id="phBox">
-            <span class="label"><i class="fas fa-flask"></i> PH LIVE</span>
-            <span class="live-val" id="realPH" style="color: var(--ph);">-.--</span>
+        <div class="live-grid">
+            <div class="live-card">
+                <div class="label">🌡️ TEMP LIVE</div>
+                <div id="temp-val" class="live-val" style="color:var(--danger)">--.-°</div>
+            </div>
+            <div class="live-card">
+                <div class="label">🧪 PH LIVE</div>
+                <div id="ph-val" class="live-val" style="color:var(--safe)">--.--</div>
+            </div>
         </div>
-    </div>
-
-    <div class="light-box">
-        <div class="label" style="color: var(--accent); display: flex; justify-content: space-between;">
-            <span>PROGRAMMA LUCI RL60</span>
-            <span id="faseTxt" style="font-weight: 900;">--</span>
-        </div>
-        <div class="ch-bars">
-            <div class="bar" id="bar1"><span>0%</span><div class="bar-label">CH1</div></div>
-            <div class="bar" id="bar2"><span>0%</span><div class="bar-label">CH2</div></div>
-            <div class="bar" id="bar3"><span>0%</span><div class="bar-label">CH3</div></div>
-            <div class="bar" id="bar4"><span>0%</span><div class="bar-label">CH4</div></div>
+        <div class="light-box">
+            <div style="font-size:11px; color:var(--accent); display:flex; justify-content:space-between">
+                <span>SCHEMA RL60 ATTIVO</span>
+                <span id="fase-luce">--</span>
+            </div>
+            <div class="bar-container">
+                <div class="bar-group"><div class="bar-perc" id="p1">0%</div><div class="bar"><div id="b1" class="bar-fill"></div></div></div>
+                <div class="bar-group"><div class="bar-perc" id="p2">0%</div><div class="bar"><div id="b2" class="bar-fill"></div></div></div>
+                <div class="bar-group"><div class="bar-perc" id="p3">0%</div><div class="bar"><div id="b3" class="bar-fill"></div></div></div>
+                <div class="bar-group"><div class="bar-perc" id="p4">0%</div><div class="bar"><div id="b4" class="bar-fill"></div></div></div>
+            </div>
         </div>
     </div>
 
-    <div class="section-box">
-        <span class="label">Analisi Acqua</span>
-        <div class="grid-inputs">
-            <input type="text" id="tPH" placeholder="pH">
-            <input type="text" id="tKH" placeholder="KH">
-            <input type="text" id="tSAL" placeholder="SAL">
-            <input type="text" id="tMG" placeholder="MG">
-            <input type="text" id="tCA" placeholder="CA">
-            <input type="text" id="tNO3" placeholder="NO3">
-            <input type="text" id="tNO2" placeholder="NO2">
-        </div>
-        <button class="btn" onclick="saveTests()">REGISTRA ANALISI</button>
-        <div id="testHistory" style="font-size: 10px; margin-top: 10px; color: #5c6d7e; font-family: monospace;"></div>
-    </div>
+    <script>
+        const accessId = "3apycv3f8uredehye35n";
+        const accessKey = "6db766e2c0fb4959b69a300581a2f05f";
+        const deviceId = "Bf3d7b66b022cf52f6fsjf";
+        const baseUrl = "https://openapi.tuyaeu.com";
 
-    <div class="section-box">
-        <span class="label">Log Cambi Acqua</span>
-        <div class="grid-inputs" style="grid-template-columns: 1fr 1fr;">
-            <input type="text" id="cData" placeholder="Data">
-            <input type="text" id="cLitri" placeholder="Litri">
-        </div>
-        <button class="btn" onclick="saveCambi()" style="border-color: var(--gold); color: var(--gold);">REGISTRA CAMBIO</button>
-        <div id="cambioHistory" style="font-size: 10px; margin-top: 10px; color: var(--gold); font-family: monospace;"></div>
-    </div>
-
-    <div class="section-box">
-        <span class="label">Calcolatore Volume Netto</span>
-        <div class="grid-inputs">
-            <input type="number" id="vL" value="90">
-            <input type="number" id="vP" value="45">
-            <input type="number" id="vA" value="45">
-        </div>
-        <button class="btn" onclick="calcVol()" style="border: 1px solid #5c6d7e; color: #5c6d7e;">Ricalcola Litri</button>
-        <div id="volRes" style="margin-top: 10px; text-align: center; color: var(--gold); font-weight: bold;">Litri: 182 L</div>
-    </div>
-
-    <div class="status-footer">
-        <span><i class="fas fa-broadcast-tower"></i> DATA CENTER: EU</span>
-        <span><i class="fas fa-check-circle"></i> SYSTEM ONLINE</span>
-    </div>
-</div>
-
-<script>
-    // CREDENZIALI INTEGRATE
-    const reefConfig = {
-        id: '3apycv3f8uredehye35n',
-        sec: '6db766e2c0fb4959b69a300581a2f05f',
-        dev: 'Bf3d7b66b022cf52f6fsjf'
-    };
-
-    async function updateSystem() {
-        const ora = new Date().getHours();
-        const status = document.getElementById('statusInfo');
-        
-        // --- LOGICA LUCI RL60 [cite: 2025-10-27] ---
-        let ch = [0, 0, 0, 0];
-        let fase = "NOTTE / STANDBY";
-        if (ora >= 14 && ora < 20) { ch = [65, 98, 100, 7]; fase = "MAX PHOTO PERIOD"; }
-        else if (ora >= 20 && ora < 21) { ch = [26, 39, 50, 0]; fase = "SUNSET MODE"; }
-        else if (ora >= 22 || ora < 1) { ch = [0, 5, 5, 0]; fase = "MOONLIGHT"; }
-        
-        document.getElementById('faseTxt').innerText = fase;
-        for(let i=1; i<=4; i++) {
-            document.getElementById('bar'+i).style.height = ch[i-1] + "%";
-            document.getElementById('bar'+i).querySelector('span').innerText = ch[i-1] + "%";
+        async function getTuyaData() {
+            const timestamp = Date.now();
+            const sign = CryptoJS.HmacSHA256(accessId + timestamp, accessKey).toString().toUpperCase();
+            try {
+                const response = await fetch(`${baseUrl}/v1.0/devices/${deviceId}/status`, {
+                    headers: { 'client_id': accessId, 'sign': sign, 't': timestamp, 'sign_method': 'HMAC-SHA256' }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    data.result.forEach(item => {
+                        if (item.code.includes('temp')) document.getElementById('temp-val').innerText = (item.value / 10).toFixed(1) + "°";
+                        if (item.code.includes('ph')) document.getElementById('ph-val').innerText = (item.value / 100).toFixed(2);
+                    });
+                    document.getElementById('status').innerText = "SYSTEM ONLINE - CENTRAL EUROPE";
+                }
+            } catch (e) { document.getElementById('status').innerText = "RECONNECTING..."; }
         }
 
-        // --- COLLEGAMENTO LIVE (Predisposizione Cloud) ---
-        try {
-            // Qui inseriremo il fetch reale una volta caricato su GitHub
-            status.innerText = "CLOUDLINK: ACTIVE (STATION EU)";
-            status.style.color = "#00d2ff";
+        function updateLights() {
+            const ora = new Date().getHours();
+            let ch = [0,0,0,0], fase = "Notte";
+            if (ora >= 14 && ora < 20) { ch = [65, 98, 100, 7]; fase = "Picco Max"; }
+            else if (ora >= 11 && ora < 14) { ch = [13, 26, 30, 0]; fase = "Alba"; }
+            else if (ora >= 20 && ora < 22) { ch = [0, 13, 20, 0]; fase = "Tramonto"; }
             
-            // Per ora manteniamo la reattività grafica
-            let ph = (8.15).toFixed(2);
-            let temp = (25.3).toFixed(1);
-            
-            document.getElementById('realPH').innerText = ph;
-            document.getElementById('realTemp').innerText = temp + "°";
-        } catch (e) {
-            status.innerText = "CLOUDLINK: ERROR - RETRYING...";
-            status.style.color = var(--alert);
+            for(let i=1; i<=4; i++) {
+                document.getElementById(`b${i}`).style.height = ch[i-1] + "%";
+                document.getElementById(`p${i}`).innerText = ch[i-1] + "%";
+            }
+            document.getElementById('fase-luce').innerText = fase;
         }
-    }
 
-    function saveTests() {
-        const val = `pH:${document.getElementById('tPH').value} KH:${document.getElementById('tKH').value} SAL:${document.getElementById('tSAL').value}`;
-        localStorage.setItem('reef_tests_full', val);
-        document.getElementById('testHistory').innerText = "> Ultima Analisi: " + val;
-    }
-
-    function saveCambi() {
-        const val = `${document.getElementById('cLitri').value}L il ${document.getElementById('cData').value}`;
-        localStorage.setItem('reef_cambi_full', val);
-        document.getElementById('cambioHistory').innerText = "> Log: " + val;
-    }
-
-    function calcVol() {
-        const l = document.getElementById('vL').value;
-        const p = document.getElementById('vP').value;
-        const a = document.getElementById('vA').value;
-        const tot = (l * p * a) / 1000;
-        document.getElementById('volRes').innerText = `LITRI NETTI: ${Math.round(tot)} L`;
-    }
-
-    window.onload = function() {
-        document.getElementById('testHistory').innerText = "> " + (localStorage.getItem('reef_tests_full') || "DATI ASSENTI");
-        document.getElementById('cambioHistory').innerText = "> " + (localStorage.getItem('reef_cambi_full') || "LOG VUOTO");
-        updateSystem();
-        setInterval(updateSystem, 15000);
-    }
-</script>
+        setInterval(getTuyaData, 30000);
+        setInterval(updateLights, 5000);
+        getTuyaData(); updateLights();
+    </script>
 </body>
 </html>
