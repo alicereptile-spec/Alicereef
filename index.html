@@ -3,57 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALICEREEF PRO - SISTEMA INTEGRALE</title>
+    <title>ALICEREEF PRO - LIVE CLOUD SYSTEM</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
         :root { --bg: #03070b; --panel: #0b141d; --accent: #00d2ff; --safe: #00ff88; --danger: #ff3b3b; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #e0e6ed; margin: 0; padding: 10px; }
         .container { max-width: 480px; margin: auto; }
         .header { background: linear-gradient(180deg, #0a1e29 0%, #03070b 100%); padding: 15px; border-radius: 15px; border: 1px solid #1a3a4a; text-align: center; margin-bottom: 10px; }
-        
-        /* Sensori Live */
-        .live-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .card { background: var(--panel); padding: 15px; border-radius: 12px; border-bottom: 3px solid var(--accent); text-align: center; }
-        .val { font-size: 28px; font-weight: bold; font-family: monospace; }
-
-        /* Luci RL60 Live */
         .box { background: var(--panel); padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #1a3a4a; }
-        .bar-container { display: flex; gap: 8px; height: 50px; align-items: flex-end; margin-top: 10px; background: #071017; padding: 5px; border-radius: 5px; }
-        .bar { flex: 1; background: #162a35; border-radius: 3px; position: relative; height: 100%; }
-        .fill { position: absolute; bottom: 0; width: 100%; background: var(--accent); transition: height 1s; box-shadow: 0 0 10px var(--accent); }
-
-        /* Stato Attrezzatura */
-        .status-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-top: 10px; }
-        .device { padding: 8px; border-radius: 8px; font-size: 10px; text-align: center; background: #162a35; border: 1px solid #1a3a4a; }
+        .val { font-size: 32px; font-weight: bold; font-family: monospace; }
+        .status-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
+        .device { padding: 8px; border-radius: 8px; font-size: 10px; text-align: center; background: #162a35; border: 1px solid #1a3a4a; font-weight: bold; }
         .on { color: var(--safe); border-color: var(--safe); box-shadow: inset 0 0 5px var(--safe); }
-
-        /* Tabella Test */
         .test-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 10px; }
         .test-item { background: #071017; padding: 5px; border-radius: 5px; border: 1px solid #1a3a4a; }
         .test-item label { font-size: 9px; color: var(--accent); display: block; }
-        .test-item input { width: 100%; background: none; border: none; color: white; font-size: 12px; }
-
+        .test-item input { width: 100%; background: none; border: none; color: white; font-size: 12px; text-align: center; }
+        .bar-container { display: flex; gap: 6px; height: 50px; align-items: flex-end; margin-top: 10px; background: #071017; padding: 5px; border-radius: 5px; }
+        .bar { flex: 1; background: #162a35; border-radius: 3px; position: relative; height: 100%; }
+        .fill { position: absolute; bottom: 0; width: 100%; background: var(--accent); transition: height 1s; box-shadow: 0 0 10px var(--accent); }
         button { width: 100%; padding: 12px; background: var(--accent); color: #03070b; border: none; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1 style="margin:0; font-size:18px;">ALICEREEF <span style="color:var(--accent)">PRO</span></h1>
-            <div id="sync" style="font-size:9px; color:var(--safe)">Sincronizzazione Cloud Tuya...</div>
+            <h1 style="margin:0; font-size:20px; letter-spacing:1px;">ALICEREEF <span style="color:var(--accent)">PRO</span></h1>
+            <div id="giorni-info" style="font-size:11px; color:var(--safe); margin-top:5px;">Sincronizzazione Cloud...</div>
         </div>
 
-        <div class="live-grid">
-            <div class="card"><div style="font-size:10px">TEMPERATURA</div><div id="temp" class="val" style="color:var(--danger)">23.9°</div></div>
-            <div class="card"><div style="font-size:10px">PH LIVE</div><div id="ph" class="val" style="color:var(--safe)">8.81</div></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom:10px;">
+            <div class="box" style="text-align:center; margin:0;"><div style="font-size:10px">TEMPERATURA</div><div id="temp-val" class="val" style="color:var(--danger)">23.9°</div></div>
+            <div class="box" style="text-align:center; margin:0;"><div style="font-size:10px">PH LIVE</div><div id="ph-val" class="val" style="color:var(--safe)">8.81</div></div>
         </div>
 
         <div class="box">
-            <span style="font-size:11px; font-weight:bold;">STATO ATTREZZATURA</span>
+            <span style="font-size:11px; font-weight:bold; color:var(--accent)">STATO DISPOSITIVI TUYA</span>
             <div class="status-grid">
                 <div class="device on">POMPA RISALITA</div>
                 <div class="device on">MOVIMENTO</div>
                 <div class="device">SKIMMER</div>
+                <div id="reattore-ui" class="device on">REATTORE ALGHE</div>
             </div>
         </div>
 
@@ -63,15 +53,16 @@
                 <span id="fase-info" style="color:var(--accent)">--</span>
             </div>
             <div class="bar-container">
-                <div class="bar"><div id="b1" class="fill"></div><div style="position:absolute; top:-15px; width:100%; font-size:8px; text-align:center;">CH1</div></div>
-                <div class="bar"><div id="b2" class="fill"></div><div style="position:absolute; top:-15px; width:100%; font-size:8px; text-align:center;">CH2</div></div>
-                <div class="bar"><div id="b3" class="fill"></div><div style="position:absolute; top:-15px; width:100%; font-size:8px; text-align:center;">CH3</div></div>
-                <div class="bar"><div id="b4" class="fill"></div><div style="position:absolute; top:-15px; width:100%; font-size:8px; text-align:center;">CH4</div></div>
+                <div class="bar"><div id="b1" class="fill"></div><div style="position:absolute; top:-15px; width:100%; font-size:7px; text-align:center;">CH1</div></div>
+                <div class="bar"><div id="b2" class="fill"></div><div style="position:absolute; top:-15px; width:100%; font-size:7px; text-align:center;">CH2</div></div>
+                <div class="bar"><div id="b3" class="fill"></div><div style="position:absolute; top:-15px; width:100%; font-size:7px; text-align:center;">CH3</div></div>
+                <div class="bar"><div id="b4" class="fill"></div><div style="position:absolute; top:-15px; width:100%; font-size:7px; text-align:center;">CH4</div></div>
             </div>
         </div>
 
         <div class="box">
-            <span style="font-size:11px; font-weight:bold;">REGISTRO TEST ACQUA</span>
+            <span style="font-size:11px; font-weight:bold; color:var(--accent)">PARAMETRI VASCA (90x45x45 + SUMP)</span>
+            <div id="volume-info" style="font-size:11px; margin: 8px 0; color:var(--safe)">Litri Totali: -- L</div>
             <div class="test-grid">
                 <div class="test-item"><label>KH</label><input type="text" placeholder="--"></div>
                 <div class="test-item"><label>CA</label><input type="text" placeholder="--"></div>
@@ -80,32 +71,51 @@
                 <div class="test-item"><label>PO4</label><input type="text" placeholder="--"></div>
                 <div class="test-item"><label>SALE</label><input type="text" placeholder="--"></div>
             </div>
-            <button onclick="alert('Salvato!')">AGGIORNA ANALISI</button>
+            <button onclick="alert('Analisi Salvata!')">REGISTRA ANALISI</button>
         </div>
 
-        <div class="box" style="font-size:11px; text-align:center;">
-            SISTEMA VASCA 90x45x45 | 182.2 LITRI
+        <div class="box">
+            <div id="cambio-status" style="font-size:11px; margin-bottom:8px;">Ultimo cambio acqua: Mai</div>
+            <button onclick="regCambio()" style="background:#ff9f00">REGISTRA CAMBIO OGGI</button>
         </div>
     </div>
 
     <script>
-        function updateAll() {
-            // Gestione Luci Live (Schema Originale)
-            const h = new Date().getHours();
-            let p = [0,0,0,0], f = "Notte";
-            if(h>=14 && h<20) { p=[65,98,100,7]; f="Picco (65/98/100/7)"; }
-            else if(h>=11 && h<14) { p=[13,26,30,0]; f="Alba"; }
-            else if(h>=20 && h<22) { p=[0,13,20,0]; f="Tramonto"; }
-            
-            for(let i=1; i<=4; i++) { document.getElementById('b'+i).style.height = p[i-1]+"%"; }
-            document.getElementById('fase-info').innerText = f;
+        // CHIAVI E ID ESTRATTI OGGI
+        const cloudConfig = {
+            id: "3apycv3f8uredehye35n",
+            key: "6db766e2c0fb4959b69a300581a2f05f",
+            device: "Bf3d7b66b022cf52f6fsjf"
+        };
 
-            // Simulazione dati real-time se il Cloud tarda
-            document.getElementById('sync').innerText = "LIVE: " + new Date().toLocaleTimeString();
+        function updateSystem() {
+            // 1. Calcolo Giorni (Start 17/12/2025)
+            const start = new Date('2025-12-17');
+            const diff = Math.floor((new Date() - start) / (1000 * 60 * 60 * 24));
+            document.getElementById('giorni-info').innerText = `VASCA ATTIVA DA ${diff} GIORNI`;
+
+            // 2. Calcolo Volume (90x45x45 + Sump stimata 50L)
+            const vasca = (90 * 45 * 45) / 1000;
+            const sump = 50; 
+            document.getElementById('volume-info').innerText = `Volume Sistema: ${(vasca + sump).toFixed(1)} Litri (Vasca: ${vasca.toFixed(1)}L + Sump: ${sump}L)`;
+
+            // 3. Schema Luci Live (65/98/100/7)
+            const ora = new Date().getHours();
+            let p = [0,0,0,0], fase = "Notte";
+            if(ora >= 14 && ora < 20) { p = [65, 98, 100, 7]; fase = "Picco Massimo"; }
+            else if(ora >= 11 && ora < 14) { p = [13, 26, 30, 0]; fase = "Alba"; }
+            else if(ora >= 20 && ora < 22) { p = [0, 13, 20, 0]; fase = "Tramonto"; }
+            
+            for(let i=1; i<=4; i++) document.getElementById('b'+i).style.height = p[i-1] + "%";
+            document.getElementById('fase-info').innerText = fase;
         }
 
-        setInterval(updateAll, 5000);
-        updateAll();
+        function regCambio() {
+            document.getElementById('cambio-status').innerText = "Ultimo cambio acqua: " + new Date().toLocaleDateString();
+        }
+
+        setInterval(updateSystem, 10000);
+        updateSystem();
     </script>
 </body>
 </html>
