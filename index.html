@@ -3,32 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALICEREEF PRO - FULL SYSTEM</title>
+    <title>ALICEREEF PRO - CALCOLO LITRI</title>
     <style>
         :root { --bg: #03070b; --panel: #0b141d; --accent: #00d2ff; --safe: #00ff88; --danger: #ff3b3b; --warn: #ff9f00; }
         body { font-family: sans-serif; background: var(--bg); color: #e0e6ed; margin: 0; padding: 10px; }
         .container { max-width: 480px; margin: auto; }
         .box { background: var(--panel); padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #1a3a4a; }
         .val { font-size: 32px; font-weight: bold; font-family: monospace; }
-        .status-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
-        .device { padding: 10px; border-radius: 8px; font-size: 10px; text-align: center; background: #162a35; border: 1px solid #1a3a4a; font-weight: bold; }
-        .on { color: var(--safe); border-color: var(--safe); box-shadow: inset 0 0 8px var(--safe); }
         .test-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 10px; }
         .test-item { background: #071017; padding: 5px; border-radius: 5px; border: 1px solid #1a3a4a; text-align: center; }
         .test-item label { font-size: 8px; color: var(--accent); display: block; }
         .test-item input { width: 100%; background: none; border: none; color: white; font-size: 11px; text-align: center; }
-        .bar-container { display: flex; gap: 6px; height: 40px; align-items: flex-end; margin-top: 10px; background: #071017; padding: 5px; border-radius: 5px; }
-        .bar { flex: 1; background: #162a35; border-radius: 3px; position: relative; height: 100%; }
-        .fill { position: absolute; bottom: 0; width: 100%; background: var(--accent); transition: height 1s; }
-        button { width: 100%; padding: 12px; background: var(--accent); color: #03070b; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        #timer-chelmon { display: none; color: var(--warn); font-weight: bold; margin-top: 5px; text-align: center; }
+        .result-litri { font-size: 14px; color: var(--safe); font-weight: bold; margin-top: 10px; text-align: center; border-top: 1px solid #1a3a4a; padding-top: 10px; }
+        button { width: 100%; padding: 12px; background: var(--accent); color: #03070b; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="box" style="text-align: center; border-bottom: 2px solid var(--accent);">
+        <div class="box" style="text-align: center;">
             <h1 style="margin:0; font-size:18px;">ALICEREEF <span style="color:var(--accent)">PRO</span></h1>
-            <div id="giorni" style="font-size:10px; color:var(--safe); margin-top:5px;">SINCRONIZZAZIONE...</div>
+            <div id="giorni" style="font-size:10px; color:var(--safe); margin-top:5px;">--</div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom:10px;">
@@ -37,83 +31,58 @@
         </div>
 
         <div class="box">
-            <span style="font-size:11px; font-weight:bold;">STATO DISPOSITIVI</span>
-            <div class="status-grid">
-                <div class="device on" id="dev-risalita">RISALITA</div>
-                <div class="device on" id="dev-movimento">MOVIMENTO</div>
-                <div class="device" id="dev-skimmer">SKIMMER</div>
-                <div class="device on" id="dev-alghe">REATTORE ALGHE</div>
+            <span style="font-size:11px; font-weight:bold; color:var(--accent)">CALCOLO VOLUME REALE (CM)</span>
+            <div class="test-grid">
+                <div class="test-item"><label>VASCA L</label><input type="number" id="vL" value="90" oninput="calc()"></div>
+                <div class="test-item"><label>VASCA P</label><input type="number" id="vP" value="45" oninput="calc()"></div>
+                <div class="test-item"><label>VASCA H</label><input type="number" id="vH" value="45" oninput="calc()"></div>
+                <div class="test-item" style="border-color:var(--warn)"><label>SUMP L</label><input type="number" id="sL" value="50" oninput="calc()"></div>
+                <div class="test-item" style="border-color:var(--warn)"><label>SUMP P</label><input type="number" id="sP" value="40" oninput="calc()"></div>
+                <div class="test-item" style="border-color:var(--warn)"><label>SUMP H H2O</label><input type="number" id="sH" value="20" oninput="calc()"></div>
             </div>
-            <button onclick="startChelmon()" style="background:var(--warn); margin-top:10px; font-size:11px;">PAPPA CHELMON (10 MIN)</button>
-            <div id="timer-chelmon">POMPE OFF: <span id="time">10:00</span></div>
+            <div class="result-litri" id="totaleLitri">Volume Totale: 222.3 Litri</div>
         </div>
 
         <div class="box">
-            <div style="display:flex; justify-content:space-between; font-size:11px;"><span>LUCI RL60</span><span id="fase" style="color:var(--accent)">--</span></div>
-            <div class="bar-container">
-                <div class="bar"><div id="b1" class="fill"></div></div>
-                <div class="bar"><div id="b2" class="fill"></div></div>
-                <div class="bar"><div id="b3" class="fill"></div></div>
-                <div class="bar"><div id="b4" class="fill"></div></div>
-            </div>
-        </div>
-
-        <div class="box">
-            <span style="font-size:11px; font-weight:bold;">ANALISI ACQUA (NO2 INCLUSA)</span>
+            <span style="font-size:11px; font-weight:bold;">ANALISI PARAMETRI</span>
             <div class="test-grid">
                 <div class="test-item"><label>KH</label><input type="text" placeholder="--"></div>
                 <div class="test-item"><label>CA</label><input type="text" placeholder="--"></div>
                 <div class="test-item"><label>MG</label><input type="text" placeholder="--"></div>
-                <div class="test-item"><label>SALE</label><input type="text" placeholder="--"></div>
                 <div class="test-item"><label>NO3</label><input type="text" placeholder="--"></div>
                 <div class="test-item" style="border-color:var(--warn)"><label>NO2</label><input type="text" placeholder="0.0"></div>
                 <div class="test-item"><label>PO4</label><input type="text" placeholder="--"></div>
-                <div class="test-item"><label>PH</label><input type="text" placeholder="--"></div>
             </div>
-            <button style="margin-top:10px; font-size:10px; height:30px;" onclick="alert('Dati Salvati')">AGGIORNA ANALISI</button>
-        </div>
-
-        <div class="box" style="font-size:10px; text-align:center;">
-            VASCA 90x45x45 | VOLUME TOTALE: 232.3 L (Vasca + Sump)
+            <button onclick="alert('Dati Salvati')">AGGIORNA ANALISI</button>
         </div>
     </div>
 
     <script>
-        const CLOUD = { id: "3apycv3f8uredehye35n", secret: "6db766e2c0fb4959b69a300581a2f05f" };
+        function calc() {
+            // Volume Vasca 90x45x45
+            const vL = document.getElementById('vL').value;
+            const vP = document.getElementById('vP').value;
+            const vH = document.getElementById('vH').value;
+            const volVasca = (vL * vP * vH) / 1000;
 
-        function update() {
-            // Giorni dal 17/12/2025
+            // Volume Sump Dinamico
+            const sL = document.getElementById('sL').value;
+            const sP = document.getElementById('sP').value;
+            const sH = document.getElementById('sH').value;
+            const volSump = (sL * sP * sH) / 1000;
+
+            const totale = (volVasca + volSump).toFixed(1);
+            document.getElementById('totaleLitri').innerText = `Volume Totale: ${totale} Litri`;
+        }
+
+        function updateGiorno() {
             const start = new Date('2025-12-17');
             const d = Math.floor((new Date() - start) / (1000 * 60 * 60 * 24));
             document.getElementById('giorni').innerText = `VASCA ATTIVA DA ${d} GIORNI`;
-
-            // Luci (65/98/100/7)
-            const h = new Date().getHours();
-            let p = [0,0,0,0], f = "Notte";
-            if(h>=14 && h<20) { p=[65,98,100,7]; f="Picco"; }
-            else if(h>=11 && h<14) { p=[13,26,30,0]; f="Alba"; }
-            else if(h>=20 && h<22) { p=[0,13,20,0]; f="Tramonto"; }
-            for(let i=1;i<=4;i++) document.getElementById('b'+i).style.height = p[i-1]+"%";
-            document.getElementById('fase').innerText = f;
         }
-
-        function startChelmon() {
-            document.getElementById('timer-chelmon').style.display = 'block';
-            document.getElementById('dev-risalita').classList.remove('on');
-            document.getElementById('dev-movimento').classList.remove('on');
-            let s = 600;
-            const t = setInterval(() => {
-                s--;
-                document.getElementById('time').innerText = Math.floor(s/60) + ":" + (s%60<10?'0':'') + s%60;
-                if(s<=0) { 
-                    clearInterval(t); 
-                    document.getElementById('dev-risalita').classList.add('on');
-                    document.getElementById('dev-movimento').classList.add('on');
-                    document.getElementById('timer-chelmon').style.display = 'none';
-                }
-            }, 1000);
-        }
-        setInterval(update, 10000); update();
+        
+        updateGiorno();
+        calc();
     </script>
 </body>
 </html>
